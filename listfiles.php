@@ -30,7 +30,16 @@
 						background-color:#def;
 						margin-right:2px;
 				}
+				
+				tr:nth-child(even) {
+  					background: #fff;
+				}
+				tr:nth-child(odd) {
+  					background: #aaa;
+				}
 			
+				#prev 
+				
 			</style>
 
 <script>
@@ -120,7 +129,8 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 		function showfiles()
 		{
 				var str="";	
-			
+				
+				// Sort folders on top and treat upper and lower case the same
 				filelist.sort(
 						function(a, b){
 								if((a.type=="dir")&&(b.type=="dir")){
@@ -138,11 +148,9 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 								}
 						}
 				);
-			
+				
+				// Breadcrumbs
 				var patharr=path.split("/");
-			
-				console.log(patharr);
-
 				oldstr=patharr[0];
 				str+="<span class='breadcrumb'><a href='/'>/</a></span>";
 				for(var i=1;i<patharr.length;i++){
@@ -162,11 +170,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 						var file=filelist[i];
 
 						if(file.filename!=".."&&file.filename!="."){
-								if((i%2)==0){
-									str+="<tr class='hi'>";							
-								}else{
-									str+="<tr class='lo'>";							
-								}
+								str+="<tr onmouseover='hoverrow(\""+path+file.filename+"\")' class='hi'>";							
 
 								str+="<td>";
 								if(file.type=="dir") str+=folder;
@@ -193,11 +197,20 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				document.getElementById("content").innerHTML=str;
 			
 		}
+			
+		function hoverrow(filename)
+		{
+				var str="";
+				str+= "<iframe src='"+filename+"'></iframe>";
+				document.getElementById("prev").innerHTML=str;
+		}
+			
 		</script>
 	
 		</head>
     <body onload="showfiles();">
 			<div id="content"></div>
+			<div id="prev"></div>
     </body>
 
 </html>
