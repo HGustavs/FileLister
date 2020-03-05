@@ -50,7 +50,7 @@ date_default_timezone_set('Europe/Stockholm');
 				}
 				
 				tr:nth-child(odd) {
-  					background: #aaa;
+  					background: #eee;
 				}
 			
 				#prev {
@@ -59,7 +59,6 @@ date_default_timezone_set('Europe/Stockholm');
 						left: 400px;
 						right: 0px;
 						bottom:0px;
-						border:1px solid green;
 				}
 				
 			</style>
@@ -113,9 +112,17 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
     }
 
 		error_reporting(E_ERROR | E_PARSE);
+		
+		$requri=$_SERVER['REQUEST_URI'];
+		$reqpos=strrpos($requri,"?");
+		$rparam=substr($requri,$reqpos+9);
+		if($rparam!="true") $rparam="false";
+		if($reqpos!==false){
+				$requri=substr($requri,0,$reqpos);
+		}
 			
     $dir=getcwd();
-		$dir.=$_SERVER['REQUEST_URI'];
+		$dir.=$requri;
     $files=scandir($dir);
     echo "<script> filelist=[";
 		$i=0;
@@ -147,9 +154,11 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
     }
     echo "];\n";
 
-		echo "var path='".$_SERVER['REQUEST_URI']."';\n";
+		echo "var path='".$requri."';\n";
 		
 		echo "</script>";
+			
+		echo "<script>var nobread='".$rparam."';</script>";
 
 ?>
 			
@@ -178,16 +187,18 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				);
 				
 				// Breadcrumbs
-				var patharr=path.split("/");
-				oldstr=patharr[0];
-				str+="<span class='breadcrumb'><a href='/'>/</a></span>";
-				for(var i=1;i<patharr.length;i++){
-						sstr="";
-						for(var j=0;j<i;j++){
-								sstr+=patharr[j]+"/";
+				if(nobread!="true"){
+						var patharr=path.split("/");
+						oldstr=patharr[0];
+						str+="<span class='breadcrumb'><a href='/'>/</a></span>";
+						for(var i=1;i<patharr.length;i++){
+								sstr="";
+								for(var j=0;j<i;j++){
+										sstr+=patharr[j]+"/";
+								}
+								if(oldstr!="") str+="<span class='breadcrumb'><a href='"+sstr+"'>"+oldstr+"</a>/</span>";
+								oldstr=patharr[i];
 						}
-						if(oldstr!="") str+="<span class='breadcrumb'><a href='"+sstr+"'>"+oldstr+"</a>/</span>";
-						oldstr=patharr[i];
 				}
 				
 				str+="<table>";
@@ -229,7 +240,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 		function hoverrow(filename,filetype)
 		{
 				var str="";
-				str+= "<iframe style='border:1px solid red;width:100%;height:100%;' src='/previewfiles.php?inurl="+encodeURIComponent(filename)+"&filetype="+filetype+"'></iframe>";
+				str+= "<iframe style='width:100%;height:100%;' src='/previewfiles.php?inurl="+encodeURIComponent(filename)+"&filetype="+filetype+"'></iframe>";
 				document.getElementById("prev").innerHTML=str;
 		}
 			

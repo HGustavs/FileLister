@@ -29,6 +29,8 @@ if(!isset($_GET['inurl'])){
 }else{
 		$filename=$_GET['inurl'];
 }
+		
+if($filetype=="") $filetype="UNK";
 
 		function parseMarkdown($inString)
 		{	
@@ -352,20 +354,24 @@ if(!isset($_GET['inurl'])){
 
 				return $instring;		
 		}
-
 		
-print_r($_GET);
-
 if($filetype=="php"||$filetype=="js"||$filetype=="html"){
-		$content = file_get_contents($filename);
+		$content = file_get_contents(getcwd().$filename);
+		$content = str_replace("<","&lt;",$content);
 		echo "<pre>";
 		echo $content;
 		echo "</pre>";
 }else if($filetype=="png"||$filetype=="svg"){
 		echo "<img src='".$filename."'>";
+}else if($filetype=="UNK"){
+		// Assume directory
+		//$filename=substr($filename,0,strpos($filename,"?"));
+		echo "<iframe style='width:100%;height:100%;' src='".$filename."?nobread=true'></iframe>";
 }else if($filetype=="md"){
 		$content = file_get_contents("http://localhost".$filename);
 		echo parseMarkdown($content);
+}else{
+		// No preview
 }
 
 ?>
