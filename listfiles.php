@@ -1,3 +1,17 @@
+<?php
+// -------------------------------------------------------------------------------------------------------------
+// -----------=============######## Apache Directory Listing and Preview System ########=============-----------
+// -------------------------------------------------------------------------------------------------------------
+//  Copyright a97marbr / HGustavs
+//
+//        (\ /)
+//        (. .)           
+//       c(")(")  ∴ 
+//-------------------------------------------------------------------------------------------------------------
+
+date_default_timezone_set('Europe/Stockholm');
+
+?>
 <html>
     <head>
 			
@@ -34,11 +48,19 @@
 				tr:nth-child(even) {
   					background: #fff;
 				}
+				
 				tr:nth-child(odd) {
   					background: #aaa;
 				}
 			
-				#prev 
+				#prev {
+						position: fixed;
+						top: 0px;
+						left: 400px;
+						right: 0px;
+						bottom:0px;
+						border:1px solid green;
+				}
 				
 			</style>
 
@@ -110,8 +132,14 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				echo "sizetext:'".format_size($size)."',";
 				echo "size:".$size.",";
 				echo "type:'".filetype($filename)."',";
-				$tpos=strrpos($filename,".");
-				$tpos=substr($filename,-(strlen($filename)-$tpos-1));
+				if(strpos($filename,".")===false){
+						$tpos="";
+				}else if(strpos($filename,".")==0){
+						$tpos="HIDDEN";
+				}else{
+						$tpos=strrpos($filename,".");
+						$tpos=substr($filename,-(strlen($filename)-$tpos-1));
+				}
 				echo "ext:'".$tpos."',";
 				echo "modif:'".date ("Ymd H:i:s.", filemtime($filename))."'";
         echo "}";
@@ -170,7 +198,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 						var file=filelist[i];
 
 						if(file.filename!=".."&&file.filename!="."){
-								str+="<tr onmouseover='hoverrow(\""+path+file.filename+"\")' class='hi'>";							
+								str+="<tr onmouseover='hoverrow(\""+path+file.filename+"\",\""+file.ext+"\")' class='hi'>";							
 
 								str+="<td>";
 								if(file.type=="dir") str+=folder;
@@ -198,10 +226,10 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 			
 		}
 			
-		function hoverrow(filename)
+		function hoverrow(filename,filetype)
 		{
 				var str="";
-				str+= "<iframe src='"+filename+"'></iframe>";
+				str+= "<iframe style='border:1px solid red;width:100%;height:100%;' src='/previewfiles.php?inurl="+encodeURIComponent(filename)+"&filetype="+filetype+"'></iframe>";
 				document.getElementById("prev").innerHTML=str;
 		}
 			
