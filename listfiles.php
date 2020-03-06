@@ -209,7 +209,9 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 						var file=filelist[i];
 
 						if(file.filename!=".."&&file.filename!="."){
-								str+="<tr onmouseover='hoverrow(\""+path+file.filename+"\",\""+file.ext+"\")' class='hi'>";							
+								str+="<tr ";
+								if(nobread!="true") str+="onmouseover='hoverrow(\""+path+file.filename+"\",\""+file.ext+"\")' ";
+								str+="class='hi'>";							
 
 								str+="<td>";
 								if(file.type=="dir") str+=folder;
