@@ -1,6 +1,21 @@
 <html>
 	<head>
 			<script>
+
+				function bixby(event)
+				{
+						var dividers=document.getElementsByClassName("divider");
+						var currentdivider=event.target.innerHTML;
+					
+						if(currentdivider=="("){
+								for(var i=0;i<dividers.length;i++){
+										if(dividers[i].innerHTML==")"){
+												dividers[i].style.backgroundColor="#f84";
+										}
+								}
+						}
+				}
+				
 			</script>
 			<style>
 				
@@ -22,6 +37,11 @@
 				.divider{
 						color:navy;
 						background:#ffd;
+				}
+				
+				.string{
+						color:orange;
+						background:#dfd;
 				}
 				
 			</style>
@@ -380,7 +400,7 @@ function markdownBlock($instring)
 		return $instring;		
 }
 		
-$tags=array("body"=>"htmltag","html"=>"htmltag","style"=>"htmltag","table"=>"htmltag","tr"=>"htmltag","td"=>"htmltag","foreach"=>"func","if"=>"func","array"=>"func");
+$tags=array("body"=>"htmltag","html"=>"htmltag","style"=>"htmltag","table"=>"htmltag","tr"=>"htmltag","td"=>"htmltag","foreach"=>"func","if"=>"func","array"=>"func","echo"=>"func","head"=>"htmltag");
 		
 function colorize($token,$prevop)
 {
@@ -389,7 +409,6 @@ function colorize($token,$prevop)
 		$testtoken=trim($token);
 		$token=str_replace("\t","&nbsp;&nbsp;",$token);
 		
-//		return "**##".$token."##".$prevop."**";
 		if((isset($tags[$testtoken]))&&($prevop=="<")){
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";
 		}else if((isset($tags[$testtoken]))&&($prevop=="/")){
@@ -397,6 +416,13 @@ function colorize($token,$prevop)
 		}else if((isset($tags[$testtoken]))){
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";		
 		}
+		return $token;
+}
+		
+function fixhtml($token)
+{
+		$token=str_replace("<","&lt;",$token);
+		$token=str_replace(">","&gt;",$token);
 		return $token;
 }
 		
@@ -410,21 +436,37 @@ function syntax($content)
 				$length = strlen($contentrow);
 				$token="";
 				$prevop="";
+				$strmode=0;
+				$divider=0;
 				for ($i=0; $i<$length; $i++) {
 						$curstr=$contentrow[$i];
-						if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"){
+						if($curstr=='"'&&$strmode==0){
+								// Start string mode!
+								$ret.=colorize($token,$prevop);
+								$prevop=$curstr;	
+								$strmode=1;
+						}else if($curstr=='"'&&$strmode==1){
+								// Print string and disable string mode!
+								$ret.="<span class='string'>&quot;".fixhtml($token)."&quot;</span>";						
+								$strmode=0;
+								$token="";
+						}else if($strmode==1){
+								// Process content in string mode!
+								$token.=$curstr;						
+						}else if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"||$curstr=="."||$curstr=="{"||$curstr=="}"){
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;							
 								if($curstr=="<") $curstr="&lt;";
 								if($curstr==">") $curstr="&gt;";
-								$ret.="<span class='divider' >".$curstr."</span>";
+								$ret.="<span onmouseover='bixby(event)' class='divider' id='".$divider."' >".$curstr."</span>";
+								$divider++;
 								$token="";
 						}else{
 								$token.=$curstr;
 						}
 				}
 			
-				$ret.=$token."<br>";
+				$ret.=colorize($token,$prevop)."<br>";
 		}
 	
 		return $ret;
