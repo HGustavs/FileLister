@@ -1,16 +1,56 @@
 <html>
 	<head>
 			<script>
+				
+				function clearhigh()
+				{
+						var dividers=document.getElementsByClassName("divider");
+						for(var i=0;i<dividers.length;i++){
+								dividers[i].style.backgroundColor="#fff";
+						}
+				}
 
 				function bixby(event)
 				{
 						var dividers=document.getElementsByClassName("divider");
 						var currentdivider=event.target.innerHTML;
+						
+						if(currentdivider=="(") currentend=")";
+						if(currentdivider==")") currentend="(";
+						if(currentdivider=="{") currentend="}";
+						if(currentdivider=="}") currentend="{";
 					
-						if(currentdivider=="("){
-								for(var i=0;i<dividers.length;i++){
-										if(dividers[i].innerHTML==")"){
+					
+						var itemno=-1;
+						for(var i=0;i<dividers.length;i++){
+								dividers[i].style.backgroundColor="#fff";
+								if(dividers[i].id==event.target.id){
+										itemno=i;
+								} 
+						}
+					
+						if(currentdivider=="("||currentdivider=="{"){
+								var cnt=0;
+								for(var i=itemno+1;i<dividers.length;i++){
+										if(dividers[i].innerHTML==currentend&&cnt==0){
 												dividers[i].style.backgroundColor="#f84";
+												break;
+										}else if(dividers[i].innerHTML==currentend){
+												cnt--;
+										}else if(dividers[i].innerHTML==currentdivider){
+												cnt++;
+										}
+								}
+						}else if(currentdivider==")"||currentdivider=="}"){
+								var cnt=0;
+								for(var i=itemno-1;i>0;i--){
+										if(dividers[i].innerHTML==currentend&&cnt==0){
+												dividers[i].style.backgroundColor="#f84";
+												break;
+										}else if(dividers[i].innerHTML==currentend){
+												cnt--;
+										}else if(dividers[i].innerHTML==currentdivider){
+												cnt++;
 										}
 								}
 						}
@@ -21,27 +61,22 @@
 				
 				.htmltag{
 						color:darkred;
-						background:#def;
 				}
 				
 				.htmltagend{
 						color:darkred;
-						background:#def;
 				}
 				
 				.func{
 						color:darkgreen;
-						background:#def;
 				}				
 				
 				.divider{
 						color:navy;
-						background:#ffd;
 				}
 				
 				.string{
 						color:orange;
-						background:#dfd;
 				}
 				
 			</style>
@@ -431,13 +466,13 @@ function syntax($content)
 		global $tags;
 		$contentarr=explode("\n",$content);
 	
+		$divider=0;
 		$ret="";
 		foreach($contentarr as $contentrow){
 				$length = strlen($contentrow);
 				$token="";
 				$prevop="";
 				$strmode=0;
-				$divider=0;
 				for ($i=0; $i<$length; $i++) {
 						$curstr=$contentrow[$i];
 						if($curstr=='"'&&$strmode==0){
@@ -458,8 +493,12 @@ function syntax($content)
 								$prevop=$curstr;							
 								if($curstr=="<") $curstr="&lt;";
 								if($curstr==">") $curstr="&gt;";
-								$ret.="<span onmouseover='bixby(event)' class='divider' id='".$divider."' >".$curstr."</span>";
-								$divider++;
+								if($curstr!=" "){
+										$ret.="<span onmouseover='bixby(event)' onmouseout='clearhigh();' class='divider' id='".$divider."' >".$curstr."</span>";
+										$divider++;
+								}else{
+										$ret.=$curstr;
+								}
 								$token="";
 						}else{
 								$token.=$curstr;
