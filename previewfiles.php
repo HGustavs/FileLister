@@ -86,11 +86,15 @@ date_default_timezone_set('Europe/Stockholm');
 				}				
 				
 				.divider{
-						color:navy;
+						color:cadetblue;
 				}
 				
 				.string{
 						color:orange;
+				}
+				
+				.variable{
+						color:darkmagenta;
 				}
 				
 			</style>
@@ -124,68 +128,79 @@ if(!isset($_GET['inurl'])){
 		
 if($filetype=="") $filetype="UNK";
 
-		function parseMarkdown($inString)
-		{	
-				$inString=preg_replace("/\</", "&lt;",$inString);
-				$inString=preg_replace("/\>/", "&gt;",$inString);
+//-------------------------------------------------------------------------------------------------
+// parseMarkdown - parse a big markdown block
+//-------------------------------------------------------------------------------------------------
+		
+function parseMarkdown($inString)
+{	
+		$inString=preg_replace("/\</", "&lt;",$inString);
+		$inString=preg_replace("/\>/", "&gt;",$inString);
 
-				$inString=preg_replace("/^\~{3}(\r\n|\n|\r)/m", "~~~@@@",$inString);
-				$inString=preg_replace("/^\=\|\=(\r\n|\n|\r)/m", "=|=&&&",$inString);
-				
-				$str="";
+		$inString=preg_replace("/^\~{3}(\r\n|\n|\r)/m", "~~~@@@",$inString);
+		$inString=preg_replace("/^\=\|\=(\r\n|\n|\r)/m", "=|=&&&",$inString);
 
-				//$codearray=explode('~~~', $inString);
-				$codearray=preg_split("/\~{3}|\=\|\=/", $inString);
-				
-				$specialBlockStart=true;
-				foreach ($codearray as $workstr) {
-						if(substr($workstr,0,3)==="@@@" && $specialBlockStart===true){
-								$specialBlockStart=false;
-								$workstr="<pre><code>".substr($workstr,3)."</code></pre>";
-						} else if (substr($workstr,0,3)==="&&&" && $specialBlockStart===true){
-								$specialBlockStart=false;
-								$workstr="<div class='console'><pre>".substr($workstr,3)."</pre></div>";
-						} else if ($workstr !== "") {
-								$workstr=parseLineByLine(preg_replace("/^\&{3}|^\@{3}/","",$workstr));
-								$specialBlockStart=true;
-						}
-						$str.=$workstr;
-						
+		$str="";
+
+		//$codearray=explode('~~~', $inString);
+		$codearray=preg_split("/\~{3}|\=\|\=/", $inString);
+
+		$specialBlockStart=true;
+		foreach ($codearray as $workstr) {
+				if(substr($workstr,0,3)==="@@@" && $specialBlockStart===true){
+						$specialBlockStart=false;
+						$workstr="<pre><code>".substr($workstr,3)."</code></pre>";
+				} else if (substr($workstr,0,3)==="&&&" && $specialBlockStart===true){
+						$specialBlockStart=false;
+						$workstr="<div class='console'><pre>".substr($workstr,3)."</pre></div>";
+				} else if ($workstr !== "") {
+						$workstr=parseLineByLine(preg_replace("/^\&{3}|^\@{3}/","",$workstr));
+						$specialBlockStart=true;
 				}
+				$str.=$workstr;
 
-				return "<div id='markdown'>".$str."</div>";
 		}
 
-		function parseLineByLine($inString) {
-			$str = $inString;	
-			$markdown = "";
+		return "<div id='markdown'>".$str."</div>";
+}
 
-			$currentLineFeed = strpos($str, PHP_EOL);
-			$currentLine = "";
-			$prevLine = "";
-			$remainingLines = "";
-			$nextLine = "";
+//-------------------------------------------------------------------------------------------------
+// parseLineByLine - parse a line of markdown code
+//-------------------------------------------------------------------------------------------------
 
-			while($currentLineFeed !== false) { // EOF
-				$prevLine = $currentLine;
-				$currentLine = substr($str, 0, $currentLineFeed);
-				$remainingLines = substr($str, $currentLineFeed + 1, strlen($str));
+function parseLineByLine($inString) {
+	$str = $inString;	
+	$markdown = "";
 
-				$nextLine = substr($remainingLines, 0, strpos($remainingLines, PHP_EOL));
+	$currentLineFeed = strpos($str, PHP_EOL);
+	$currentLine = "";
+	$prevLine = "";
+	$remainingLines = "";
+	$nextLine = "";
+
+	while($currentLineFeed !== false) { // EOF
+		$prevLine = $currentLine;
+		$currentLine = substr($str, 0, $currentLineFeed);
+		$remainingLines = substr($str, $currentLineFeed + 1, strlen($str));
+
+		$nextLine = substr($remainingLines, 0, strpos($remainingLines, PHP_EOL));
 
 
-				$markdown = identifier($prevLine, $currentLine, $markdown, $nextLine);
+		$markdown = identifier($prevLine, $currentLine, $markdown, $nextLine);
 
-				// line done parsing. change start position to next line
-		        $str = $remainingLines;
-		        $currentLineFeed = strpos($str, PHP_EOL);
+		// line done parsing. change start position to next line
+				$str = $remainingLines;
+				$currentLineFeed = strpos($str, PHP_EOL);
 
-			}
+	}
 
-			return $markdown;
-		}
-
-// identify what to parse and parse it
+	return $markdown;
+}
+		
+//-------------------------------------------------------------------------------------------------
+// identifier - identify what to parse and parse it
+//-------------------------------------------------------------------------------------------------
+		
 function identifier($prevLine, $currentLine, $markdown, $nextLine) {
 		// handle ordered lists
 		if(isOrderdList($currentLine) || isUnorderdList($currentLine)) {
@@ -208,8 +223,11 @@ function identifier($prevLine, $currentLine, $markdown, $nextLine) {
 		}
 		return $markdown;
 }
+		
+//-------------------------------------------------------------------------------------------------
+// isORderedList - Check if its an ordered list / unorderedlist/table
+//-------------------------------------------------------------------------------------------------		
 
-// Check if its an ordered list
 function isOrderdList($item) {
 		// return 1 if ordered list
 		//return preg_match('/^\s*\d+\.\s(.*)/', $item);
@@ -230,7 +248,10 @@ function isTable($item) {
 		return false; // disabled for now
 }
 
-// The creation and destruction of lists
+//-------------------------------------------------------------------------------------------------
+// handleLists - The creation and destruction of lists
+//-------------------------------------------------------------------------------------------------			
+
 function handleLists($currentLine, $prevLine, $nextLine) {
 		global $openedSublists;
 		$markdown = "";
@@ -264,12 +285,14 @@ function handleLists($currentLine, $prevLine, $nextLine) {
 						array_push($openedSublists,1);
 				}
 		}
+
 		// Stay in current list or sublist OR next line is not a list line
-	if($currentLineIndentation === $nextLineIndentation) {
-				$markdown .= "<li>";
-				$markdown .=  markdownBlock($value);
-				$markdown .= "</li>";
+		if($currentLineIndentation === $nextLineIndentation) {
+					$markdown .= "<li>";
+					$markdown .=  markdownBlock($value);
+					$markdown .= "</li>";
 		}
+		
 		// Close sublists
 		if($currentLineIndentation > $nextLineIndentation) {
 				$markdown .= "<li>";
@@ -291,6 +314,7 @@ function handleLists($currentLine, $prevLine, $nextLine) {
 						$markdown .= "</li>";
 				}
 		}
+
 		// Close all open lists if no more list rows are detected
 		if(!(isOrderdList($nextLine) || isUnorderdList($nextLine) )) {
 			$sublistsToClose=sizeof($openedSublists);
@@ -310,7 +334,11 @@ function handleLists($currentLine, $prevLine, $nextLine) {
 		return $markdown;
 }
 		
-// Function for Tables
+
+//-------------------------------------------------------------------------------------------------
+// handleTable - Handling of tables
+//-------------------------------------------------------------------------------------------------	
+
 function handleTable($currentLine, $prevLine, $nextLine) {
 		global $tableAlignmentConf;
 		$markdown = "";
@@ -368,6 +396,10 @@ function handleTable($currentLine, $prevLine, $nextLine) {
 		}
 		return $markdown;
 }
+		
+//-------------------------------------------------------------------------------------------------
+// markdownBlock - Block of markdown
+//-------------------------------------------------------------------------------------------------			
 
 function markdownBlock($instring)
 {
@@ -448,6 +480,10 @@ function markdownBlock($instring)
 
 		return $instring;		
 }
+
+//-------------------------------------------------------------------------------------------------
+// colorize - Assign the class depending on the kind of token
+//-------------------------------------------------------------------------------------------------
 		
 $tags=array("body"=>"htmltag","html"=>"htmltag","style"=>"htmltag","table"=>"htmltag","tr"=>"htmltag","td"=>"htmltag","foreach"=>"func","if"=>"func","array"=>"func","echo"=>"func","head"=>"htmltag");
 		
@@ -464,9 +500,15 @@ function colorize($token,$prevop)
 				return "<span class='".$tags[$testtoken]."end'>".$token."</span>";
 		}else if((isset($tags[$testtoken]))){
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";		
+		}else if($prevop=="$"){
+				return "<span class='variable'>".$token."</span>";				
 		}
 		return $token;
 }
+
+//-------------------------------------------------------------------------------------------------
+// fixhtml - Removes html tags by swapping < and > for html entities
+//-------------------------------------------------------------------------------------------------
 		
 function fixhtml($token)
 {
@@ -474,7 +516,11 @@ function fixhtml($token)
 		$token=str_replace(">","&gt;",$token);
 		return $token;
 }
-		
+
+//-------------------------------------------------------------------------------------------------
+// syntax - Syntax highlighting for php/javascript
+//-------------------------------------------------------------------------------------------------
+
 function syntax($content)
 {
 		global $tags;
@@ -494,6 +540,7 @@ function syntax($content)
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;	
 								$strmode=1;
+								$token="";							
 						}else if($curstr=='"'&&$strmode==1){
 								// Print string and disable string mode!
 								$ret.="<span class='string'>&quot;".fixhtml($token)."&quot;</span>";						
@@ -502,7 +549,7 @@ function syntax($content)
 						}else if($strmode==1){
 								// Process content in string mode!
 								$token.=$curstr;						
-						}else if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"||$curstr=="."||$curstr=="{"||$curstr=="}"){
+						}else if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"||$curstr=="."||$curstr=="{"||$curstr=="}"||$curstr=="$"||$curstr=="="){
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;							
 								if($curstr=="<") $curstr="&lt;";
