@@ -23,6 +23,23 @@ date_default_timezone_set('Europe/Stockholm');
 								dividers[i].style.backgroundColor="#fff";
 						}
 				}
+				
+				function clearvar()
+				{
+						var dividers=document.getElementsByClassName("variable");
+						for(var i=0;i<dividers.length;i++){
+								dividers[i].style.backgroundColor="#fff";
+						}
+				}
+	
+				function daxby(event)
+				{
+						var variables=document.getElementsByClassName("variable");
+						var currentvariable=event.target.innerHTML;
+						for(var i=0;i<variables.length;i++){
+								if(variables[i].innerHTML==currentvariable) variables[i].style.backgroundColor="#fdf";
+						}			
+				}
 
 				function bixby(event)
 				{
@@ -501,7 +518,7 @@ function colorize($token,$prevop)
 		}else if((isset($tags[$testtoken]))){
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";		
 		}else if($prevop=="$"){
-				return "<span class='variable'>".$token."</span>";				
+				return "<span class='variable' onmouseover='daxby(event)' onmouseout='clearvar();' >".$token."</span>";				
 		}
 		return $token;
 }
@@ -549,7 +566,7 @@ function syntax($content)
 						}else if($strmode==1){
 								// Process content in string mode!
 								$token.=$curstr;						
-						}else if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"||$curstr=="."||$curstr=="{"||$curstr=="}"||$curstr=="$"||$curstr=="="){
+						}else if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"||$curstr=="."||$curstr=="{"||$curstr=="}"||$curstr=="$"||$curstr=="="||$curstr=="-"){
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;							
 								if($curstr=="<") $curstr="&lt;";
