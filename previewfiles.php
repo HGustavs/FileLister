@@ -511,10 +511,10 @@ function colorize($token,$prevop)
 		$testtoken=trim($token);
 		$token=str_replace("\t","&nbsp;&nbsp;",$token);
 		
-		if((isset($tags[$testtoken]))&&($prevop=="<")){
+		if((isset($tags[$testtoken]))&&($prevop=="<")){ // <div style='border-left:1px solid red;'>
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";
 		}else if((isset($tags[$testtoken]))&&($prevop=="/")){
-				return "<span class='".$tags[$testtoken]."end'>".$token."</span>";
+				return "<span class='".$tags[$testtoken]."end'>".$token."</span>"; // </div>
 		}else if((isset($tags[$testtoken]))){
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";		
 		}else if($prevop=="$"){
@@ -589,10 +589,77 @@ function syntax($content)
 		return $ret;
 }
 		
+//-------------------------------------------------------------------------------------------------
+// pretty - HTML / XML Pretty Printing
+//-------------------------------------------------------------------------------------------------	
+function pretty($content)
+{
+		$ret="";
+		$mode=0;
+		$line="";
+		$indent=0;
+		$tag="";
+		$prev="";
+
+		$length = strlen($content);
+		for ($i=0; $i<$length; $i++) {
+				$curstr=$content[$i];
+				if($curstr=='\n'||$curstr=='\t'){
+						// Ignore enter and tab
+				}else{
+						if($mode==0&&$curstr=='<'){
+								// Start tag mode
+								$tag=$curstr;
+								$mode=1;
+						}else if($mode==1&&$curstr=='>'){
+								$tag.=$curstr;
+								$mode=0;
+								// If end tag write \n after tag -- if start tag 
+								if(strpos($tag,"/")!=false){
+										$indent--;
+										if($prev=="tag") $ret.="\n".indent($indent);
+										$ret.=$tag;
+								}else{
+										if($prev=="tag") $ret.="\n";
+										$ret.=indent($indent).$tag;
+										$indent++;
+								}
+								$prev="tag";
+						}else if($mode==1){
+								$tag.=$curstr;
+						}else if($mode==0){
+								// Text mode
+								$ret.=$curstr;
+								$prev="text";
+						}
+				}
+		}
+	
+		if($mode==1){
+			$ret.=indent($indent).$tag;
+		
+		}
+	
+		return $ret;
+}
+		
+function indent($levels)
+{
+		$str="";
+		for($i=0;$i<$levels;$i++){
+				$str.="\t";
+		}
+		return $str;
+}
+		
 if($filetype=="php"||$filetype=="js"||$filetype=="html"){
 		$content = file_get_contents(getcwd().$filename);
 		echo "<div style='font-family:courier;'>";
-		echo syntax($content);
+		if($filetype=="html"){
+				echo syntax(pretty($content));
+		}else{
+				echo syntax($content);
+		}
 		echo "</div>";
 }else if($filetype=="png"||$filetype=="svg"){
 		echo "<img src='".$filename."'>";
