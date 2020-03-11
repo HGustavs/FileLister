@@ -511,10 +511,10 @@ function colorize($token,$prevop)
 		$testtoken=trim($token);
 		$token=str_replace("\t","&nbsp;&nbsp;",$token);
 		
-		if((isset($tags[$testtoken]))&&($prevop=="<")){ // <div style='border-left:1px solid red;'>
+		if((isset($tags[$testtoken]))&&($prevop=="<")){ // 
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";
 		}else if((isset($tags[$testtoken]))&&($prevop=="/")){
-				return "<span class='".$tags[$testtoken]."end'>".$token."</span>"; // </div>
+				return "<span class='".$tags[$testtoken]."end'>".$token."</span>"; // </&gt;></div>
 		}else if((isset($tags[$testtoken]))){
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";		
 		}else if($prevop=="$"){
@@ -535,7 +535,7 @@ function fixhtml($token)
 }
 
 //-------------------------------------------------------------------------------------------------
-// syntax - Syntax highlighting for php/javascript
+// syntax - Syntax highlighting for php/javascript/html
 //-------------------------------------------------------------------------------------------------
 
 function syntax($content)
@@ -550,6 +550,7 @@ function syntax($content)
 				$token="";
 				$prevop="";
 				$strmode=0;
+				$tabs="";			
 				for ($i=0; $i<$length; $i++) {
 						$curstr=$contentrow[$i];
 						if($curstr=='"'&&$strmode==0){
@@ -566,7 +567,15 @@ function syntax($content)
 						}else if($strmode==1){
 								// Process content in string mode!
 								$token.=$curstr;						
+						}else if($curstr=="\t"){
+								$tabs.="&nbsp;&nbsp;";
 						}else if($curstr==" "||$curstr=="<"||$curstr==">"||$curstr==","||$curstr==":"||$curstr=="/"||$curstr=="("||$curstr==")"||$curstr=="."||$curstr=="{"||$curstr=="}"||$curstr=="$"||$curstr=="="||$curstr=="-"){
+								// If there are tabs ... add in before token
+								if($tabs!=""){
+										//if($curstr=="<") $ret.="<div style='border-left:1px solid red;'>";
+										$ret.=$tabs;
+										$tabs="";
+								}
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;							
 								if($curstr=="<") $curstr="&lt;";
