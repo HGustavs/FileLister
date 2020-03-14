@@ -208,6 +208,40 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				}	
 				return str;
 		}
+		
+		// flip-able sorting function that handles directories
+		function sortfunc(a,b,adir,bdir){
+				var retval=0;
+				// If directory sort positively otherwise sort flippable
+				if(	adir=="dir"&&bdir!="dir"){
+						retval=-1;
+				}else if(bdir=="dir"&&adir!="dir"){
+						retval=1;
+				}else{
+						if(sortcol=="size"){
+								if(a>b){
+										retval=1;
+								}else{
+										retval=-1;
+								}
+						}else if(sortcol=="modif"){
+								if(a>b){
+										retval=1;
+								}else{
+										retval=-1;
+								}
+						}else{
+								if(a.toUpperCase()>b.toUpperCase()){
+										retval=1;
+								}else{
+										retval=-1;
+								}
+						}
+						retval*=sortdir;
+				}
+
+				return retval;
+		}
 
 		function showfiles()
 		{
@@ -216,19 +250,15 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				// Sort folders on top and treat upper and lower case the same
 				filelist.sort(
 						function(a, b){
-								if((a.type=="dir")&&(b.type=="dir")){
-										if(a.filename.toUpperCase()>b.filename.toUpperCase()){
-												return 1;
-										}else{
-												return -1;
-										}
-								}else if(	a.type=="dir"){
-										return -1;
-								}else if(b.type=="dir"){
-										return 1;
-								}else{
-									return 0;
-								}
+								if(sortcol=="filename"){
+										return sortfunc(a.filename,b.filename,a.type,b.type);
+								}else if(sortcol=="kind"){
+										return sortfunc(a.ext,b.ext,a.type,b.type);								
+								}else if(sortcol=="size"){
+										return sortfunc(a.size,b.size,b.type,a.type);								
+								}else if(sortcol=="modif"){
+										return sortfunc(new Date(a.modif),new Date(b.modif),"dir","dir");								
+								}						
 						}
 				);
 				
@@ -293,7 +323,12 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 								if(smoothdate==yesterday) smoothdate="Yesterday";
 								if(smoothdate==today) smoothdate="";
 							
-								smoothdate+=" "+dat.getHours()+":"+dat.getMinutes();
+								smoothdate+=" ";
+								if(dat.getHours()<=9) smoothdate+="0";
+								smoothdate+=dat.getHours();
+								smoothdate+=":";
+								if(dat.getMinutes()<=9) smoothdate+="0";
+								smoothdate+=dat.getMinutes();
 															
 								if(dat.getFullYear()==1970) smoothdate="";
 								
