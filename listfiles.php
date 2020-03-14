@@ -28,6 +28,7 @@ date_default_timezone_set('Europe/Stockholm');
 				th {
 						background: #eee;
 						border-bottom: 1px groove;
+						border-right: 1px dotted #999;
 				}
 				
 				.hi {
@@ -181,10 +182,31 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 			
 		function fsort(col)
 		{
-				if(col==sortcol) sortdir=-sortdir;
-				
-				
-				alert(col+" "+sortcol);
+				if(col==sortcol){
+						sortdir=-sortdir;
+				}else{
+						sortdir=1;
+						sortcol=col;
+				}
+				showfiles();
+		}
+			
+		function header(col)
+		{
+				var str="UNK";
+				if(nobread!="true"){
+						if(sortcol==col&&sortdir==1){
+								str="<th onclick='fsort(\""+col+"\")'>"+col+"&#9660;</th>";			
+						}else if(sortcol==col&&sortdir==-1){
+								str="<th onclick='fsort(\""+col+"\")'>"+col+"&#128169;</th>";
+						}else{
+								str="<th onclick='fsort(\""+col+"\")'>"+col+"</th>";				
+						}
+
+				}else{
+						return "<th>"+col+"</th>";
+				}	
+				return str;
 		}
 
 		function showfiles()
@@ -227,13 +249,13 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				
 				str+="<table>";
 				str+="<tr>";
-				str+="<th>&nbsp;</th>";			
-				str+="<th onclick='fsort(\"filename\")'>Filename</th>";
-				str+="<th onclick='fsort(\"kind\")'>Kind</th>";
-				str+="<th onclick='fsort(\"size\")' >Size</th>";
-				str+="<th onclick='fsort(\"modif\")'>Modified</th>";			
-			
+				str+="<th>&nbsp;</th>";	
+				str+=header('filename');
+				str+=header('kind');
+				str+=header('size');
+				str+=header('modif');			
 				str+="</tr>";
+			
 				for(var i=0;i<filelist.length;i++){
 						var file=filelist[i];
 
