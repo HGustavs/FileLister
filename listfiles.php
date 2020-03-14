@@ -49,7 +49,13 @@ date_default_timezone_set('Europe/Stockholm');
 						}
 						tr:hover:nth-child(odd){
 								background:#543;
-						}					
+						}	
+					
+						.breadcrumb {
+								color:#ccc;
+								background:#333;
+						}
+					
 				}
 				
 				@media (prefers-color-scheme: light) {
@@ -75,6 +81,10 @@ date_default_timezone_set('Europe/Stockholm');
 								color:#222;
 						}
 					
+						.breadcrumb {
+								color:#222;
+								background:#ddd;
+						}
 				}
 				
 				body{
@@ -95,11 +105,9 @@ date_default_timezone_set('Europe/Stockholm');
 				}
 				
 				.breadcrumb {
-					font-family: Lucida Grande,Lucida Sans Unicode,Lucida Sans,Geneva,Verdana,sans-serif;
-					font-size: 10px;					
-						padding:3px;
-						border:1px solid red;
-						background-color:#def;
+						font-family: Lucida Grande,Lucida Sans Unicode,Lucida Sans,Geneva,Verdana,sans-serif;
+						font-size: 14px;					
+						padding-left:3px;
 						margin-right:2px;
 				}
 			
@@ -117,6 +125,10 @@ date_default_timezone_set('Europe/Stockholm');
 				
 				.fileprops{
 						font-weight: 100;
+				}
+				
+				.breadspacer{
+						height:20px;
 				}
 				
 			</style>
@@ -191,7 +203,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				echo "{";
         echo "filename:'".$filename."',";
 				
-				$size=filesize($filename);
+				$size=filesize($dir."/".$filename);
 				if($size=="") $size=0;
 			
 				echo "sizetext:'".format_size($size)."',";
@@ -324,7 +336,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				if(nobread!="true"){
 						var patharr=path.split("/");
 						oldstr=patharr[0];
-						str+="<span class='breadcrumb'><a href='/'>/</a></span>";
+						str+="<div class='breadspacer'><span class='breadcrumb'><a href='/'>/</a></span>";
 						for(var i=1;i<patharr.length;i++){
 								sstr="";
 								for(var j=0;j<i;j++){
@@ -333,6 +345,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 								if(oldstr!="") str+="<span class='breadcrumb'><a href='"+sstr+"'>"+oldstr+"</a>/</span>";
 								oldstr=patharr[i];
 						}
+						str+="</div>";
 				}
 				
 				str+="<table>";
