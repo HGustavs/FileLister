@@ -684,7 +684,7 @@ function indent($levels)
 		
 if($filetype=="php"||$filetype=="js"||$filetype=="html"){
 		$content = file_get_contents(getcwd().$filename);
-		echo "<div style='font-family:courier;'>";
+		echo "<div style='font-family:courier;font-size:12px;'>";
 		if($filetype=="html"){
 				echo syntax(pretty($content));
 		}else{

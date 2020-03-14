@@ -56,7 +56,7 @@ date_default_timezone_set('Europe/Stockholm');
 				#prev {
 						position: fixed;
 						top: 0px;
-						left: 400px;
+						left: 460px;
 						right: 0px;
 						bottom:0px;
 				}
@@ -148,7 +148,8 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 						$tpos=substr($filename,-(strlen($filename)-$tpos-1));
 				}
 				echo "ext:'".$tpos."',";
-				echo "modif:'".date ("Ymd H:i:s.", filemtime($filename))."'";
+				echo "modif:'".date ("Y-m-d H:i:s", filemtime($filename))."',";
+				echo "crea:'".date ("Y-m-d H:i:s", filectime($filename))."'";			
         echo "}";
 				$i++;
     }
@@ -163,6 +164,29 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 ?>
 			
 		<script>
+			
+		var sortdir=1;
+		var sortcol="filename";
+			
+		function formatDate(dat)
+		{
+				var smoothdate="";
+				smoothdate+=dat.getFullYear()+" ";
+				if(dat.getMonth()<9) smoothdate+="0"
+				smoothdate+=(dat.getMonth()+1)+" ";
+				smoothdate+=dat.getDate();
+			
+				return smoothdate;
+		}
+			
+		function fsort(col)
+		{
+				if(col==sortcol) sortdir=-sortdir;
+				
+				
+				alert(col+" "+sortcol);
+		}
+
 		function showfiles()
 		{
 				var str="";	
@@ -204,7 +228,11 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				str+="<table>";
 				str+="<tr>";
 				str+="<th>&nbsp;</th>";			
-				str+="<th>Filename</th>";
+				str+="<th onclick='fsort(\"filename\")'>Filename</th>";
+				str+="<th onclick='fsort(\"kind\")'>Kind</th>";
+				str+="<th onclick='fsort(\"size\")' >Size</th>";
+				str+="<th onclick='fsort(\"modif\")'>Modified</th>";			
+			
 				str+="</tr>";
 				for(var i=0;i<filelist.length;i++){
 						var file=filelist[i];
@@ -227,13 +255,28 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 								if(file.type!="dir") str+=file.ext;
 								str+="</td>";
 
-								str+="<td>";
-								str+=file.size;
+								str+="<td style='text-align:right;'>";
+								str+=file.sizetext;
 								str+="</td>";		
 							
-								str+="<td>";
-								str+=file.type;
-								str+="</td>";									 
+								str+="<td style='text-align:right;'>";
+								var dat=new Date(file.modif);
+								var smoothdate=formatDate(dat);
+
+								var cdate=new Date;
+								today=formatDate(cdate);	
+								cdate.setDate(cdate.getDate() - 1);
+								yesterday=formatDate(cdate);
+							
+								if(smoothdate==yesterday) smoothdate="Yesterday";
+								if(smoothdate==today) smoothdate="";
+							
+								smoothdate+=" "+dat.getHours()+":"+dat.getMinutes();
+															
+								if(dat.getFullYear()==1970) smoothdate="";
+								
+								str+=smoothdate;
+								str+="</td>";								
 
 								str+="</tr>";
 						}
