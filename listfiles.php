@@ -203,6 +203,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				
 				str+="<table>";
 				str+="<tr>";
+				str+="<th>&nbsp;</th>";			
 				str+="<th>Filename</th>";
 				str+="</tr>";
 				for(var i=0;i<filelist.length;i++){
@@ -211,7 +212,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 						if(file.filename!=".."&&file.filename!="."){
 								str+="<tr ";
 								if(nobread!="true") str+="onmouseover='hoverrow(\""+path+file.filename+"\",\""+file.ext+"\")' ";
-								str+="class='hi'>";							
+								str+="class='hi' >";							
 
 								str+="<td>";
 								if(file.type=="dir") str+=folder;
@@ -226,6 +227,10 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 								if(file.type!="dir") str+=file.ext;
 								str+="</td>";
 
+								str+="<td>";
+								str+=file.size;
+								str+="</td>";		
+							
 								str+="<td>";
 								str+=file.type;
 								str+="</td>";									 

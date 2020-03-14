@@ -114,6 +114,10 @@ date_default_timezone_set('Europe/Stockholm');
 						color:darkmagenta;
 				}
 				
+				.comment{
+						color:#bbb;
+				}				
+				
 			</style>
 	</head>
 	<body>
@@ -545,6 +549,7 @@ function syntax($content)
 	
 		$divider=0;
 		$ret="";
+		$strmode=0;	
 		foreach($contentarr as $contentrow){
 				$length = strlen($contentrow);
 				$token="";
@@ -553,7 +558,12 @@ function syntax($content)
 				$tabs="";			
 				for ($i=0; $i<$length; $i++) {
 						$curstr=$contentrow[$i];
-						if($curstr=='"'&&$strmode==0){
+						if($curstr=="/"&&$prevop=="/"&&$strmode!=2){
+								$ret.=colorize($token,$prevop);
+								$prevop=$curstr;	
+								$strmode=2;
+								$token="";
+						}else if($curstr=='"'&&$strmode==0){
 								// Start string mode!
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;	
@@ -564,8 +574,10 @@ function syntax($content)
 								$ret.="<span class='string'>&quot;".fixhtml($token)."&quot;</span>";						
 								$strmode=0;
 								$token="";
-						}else if($strmode==1){
+						}else if($strmode==1||$strmode==2){
 								// Process content in string mode!
+								if($curstr=="<") $curstr="&lt;";
+								if($curstr==" ") $curstr="&nbsp;";
 								$token.=$curstr;						
 						}else if($curstr=="\t"){
 								$tabs.="&nbsp;&nbsp;";
@@ -591,8 +603,18 @@ function syntax($content)
 								$token.=$curstr;
 						}
 				}
-			
-				$ret.=colorize($token,$prevop)."<br>";
+
+				if($strmode!=2){
+						if($tabs!=""){
+								//if($curstr=="<") $ret.="<div style='border-left:1px solid red;'>";
+								$ret.=$tabs;
+								$tabs="";
+						}					
+						$ret.=colorize($token,$prevop)."<br>";
+				}else{
+						// We are at end of line and print preceding comment line
+						$ret.="<span class='comment'>/".$token."</span><br>";							
+				}
 		}
 	
 		return $ret;
@@ -646,7 +668,6 @@ function pretty($content)
 	
 		if($mode==1){
 			$ret.=indent($indent).$tag;
-		
 		}
 	
 		return $ret;
