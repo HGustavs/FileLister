@@ -16,42 +16,91 @@ date_default_timezone_set('Europe/Stockholm');
     <head>
 			
 			<style>
+				
+				@media (prefers-color-scheme: dark) {
+						body{
+							background-color:#222;
+							color:#eee;
+						}
+						th {
+								background: #444;
+								border-right: 1px dotted #555;
+								border-bottom: 1px solid #666;
+
+						}
+						tr:nth-child(even) {
+								background: #222;
+						}
+
+						tr:nth-child(odd) {
+								background: #333;
+						}			
+					
+						a{
+								color:#eef;
+						}
+
+						.fileprop{
+								color:#ccc;
+						}
+					
+						tr:hover:nth-child(even){
+								background:#483828;
+						}
+						tr:hover:nth-child(odd){
+								background:#543;
+						}					
+				}
+				
+				@media (prefers-color-scheme: light) {
+						body{
+								background-color:#fff;
+								color:#000;
+						}
+						th {
+								background: #eee;
+								border-right: 1px dotted #999;
+						}
+						tr:nth-child(even) {
+								background: #fff;
+						}
+
+						tr:nth-child(odd) {
+								background: #eee;
+						}			
+						a{
+								color:#000;
+						}		
+						.fileprop{
+								color:#222;
+						}
+					
+				}
+				
+				body{
+						font-family: Lucida Grande,Lucida Sans Unicode,Lucida Sans,Geneva,Verdana,sans-serif;
+						font-size: 10px;
+				}
+				
 				table{
-					font-family: Lucida Grande,Lucida Sans Unicode,Lucida Sans,Geneva,Verdana,sans-serif;
-					font-size: 10px;
-					font-style: normal;
-					font-variant: normal;
-					font-weight: 100;
-					border-collapse: collapse;
+						font-family: Lucida Grande,Lucida Sans Unicode,Lucida Sans,Geneva,Verdana,sans-serif;
+						font-size: 10px;
+						font-style: normal;
+						font-variant: normal;
+						font-weight: 100;
+						border-collapse: collapse;
 				}		
 
 				th {
-						background: #eee;
-						border-bottom: 1px groove;
-						border-right: 1px dotted #999;
-				}
-				
-				.hi {
-					 background:#fff;
-				}
-
-				.lo {
-					 background:#e8e8e8;
 				}
 				
 				.breadcrumb {
+					font-family: Lucida Grande,Lucida Sans Unicode,Lucida Sans,Geneva,Verdana,sans-serif;
+					font-size: 10px;					
 						padding:3px;
 						border:1px solid red;
 						background-color:#def;
 						margin-right:2px;
-				}
-				
-				tr:nth-child(even) {
-  					background: #fff;
-				}
-				
-				tr:nth-child(odd) {
-  					background: #eee;
 				}
 			
 				#prev {
@@ -60,6 +109,14 @@ date_default_timezone_set('Europe/Stockholm');
 						left: 460px;
 						right: 0px;
 						bottom:0px;
+				}
+				
+				.filename{
+						font-weight: bold;
+				}
+				
+				.fileprops{
+						font-weight: 100;
 				}
 				
 			</style>
@@ -175,6 +232,7 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 				smoothdate+=dat.getFullYear()+" ";
 				if(dat.getMonth()<9) smoothdate+="0"
 				smoothdate+=(dat.getMonth()+1)+" ";
+				if(dat.getDate()<9) smoothdate+="0"			
 				smoothdate+=dat.getDate();
 			
 				return smoothdate;
@@ -298,20 +356,20 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 								if(file.type=="dir") str+=folder;
 								str+="</td>";
 
-								str+="<td>";
+								str+="<td class='filename' >";
 								str+="<a href='"+path+file.filename+"'>"
 								str+=file.filename;
 								str+="</td>";
 
-								str+="<td>";
+								str+="<td class='fileprop'>";
 								if(file.type!="dir") str+=file.ext;
 								str+="</td>";
 
-								str+="<td style='text-align:right;'>";
+								str+="<td class='fileprop' style='text-align:right;'>";
 								str+=file.sizetext;
 								str+="</td>";		
 							
-								str+="<td style='text-align:right;'>";
+								str+="<td class='fileprop' style='text-align:right;padding-left:12px;'>";
 								var dat=new Date(file.modif);
 								var smoothdate=formatDate(dat);
 
