@@ -14,6 +14,101 @@ date_default_timezone_set('Europe/Stockholm');
 ?>
 <html>
 	<head>
+
+			<style>
+				
+				@media (prefers-color-scheme: dark) {
+						.htmltag{
+								color:#de935f;
+						}
+
+						.htmltagend{
+								color:#de935f;
+						}
+
+						.divider{
+								color:#c5c8c6;
+						}
+
+						.string{
+								color:#8f9d6a;
+						}
+
+						.variable{
+								color:#f9ee98;
+						}
+
+						.comment{
+								color:#bbb;
+						}
+					
+						.name {
+									color:#607392;
+						}
+						.func{
+								color:#cf8843;
+						}				
+					
+						.numeric {
+									color: #ffcc00;
+						}
+					
+						.hi{
+								background:#480;							
+						}
+					
+					.markdown{
+								color: #999;
+					}
+					
+				}
+
+				@media (prefers-color-scheme: light) {
+						.htmltag{
+								color:darkred;
+						}
+
+						.htmltagend{
+								color:darkred;
+						}
+
+						.func{
+								color:darkgreen;
+						}				
+
+						.divider{
+								color:cadetblue;
+						}
+
+						.string{
+								color:orange;
+						}
+					
+						.numeric{
+								color:orange;
+						}					
+
+						.variable{
+								color:darkmagenta;
+						}
+
+						.comment{
+								color:#bbb;
+						}
+					
+						.hi{
+								background:#dfd;							
+						}
+					
+					.markdown{
+								color: #000;
+					}					
+		
+				}
+
+				
+			</style>
+		
 			<script>
 				
 				function clearhigh()
@@ -101,92 +196,7 @@ date_default_timezone_set('Europe/Stockholm');
 						}
 				}
 				
-			</script>
-			<style>
-				
-				@media (prefers-color-scheme: dark) {
-						.htmltag{
-								color:#de935f;
-						}
-
-						.htmltagend{
-								color:#de935f;
-						}
-
-						.divider{
-								color:#c5c8c6;
-						}
-
-						.string{
-								color:#8f9d6a;
-						}
-
-						.variable{
-								color:#f9ee98;
-						}
-
-						.comment{
-								color:#bbb;
-						}
-					
-						.name {
-									color:#607392;
-						}
-						.func{
-								color:#cf8843;
-						}				
-					
-						.numeric {
-									color: #ffcc00;
-						}
-					
-						.hi{
-								background:#480;							
-						}
-					
-				}
-
-				@media (prefers-color-scheme: light) {
-						.htmltag{
-								color:darkred;
-						}
-
-						.htmltagend{
-								color:darkred;
-						}
-
-						.func{
-								color:darkgreen;
-						}				
-
-						.divider{
-								color:cadetblue;
-						}
-
-						.string{
-								color:orange;
-						}
-					
-						.numeric{
-								color:orange;
-						}					
-
-						.variable{
-								color:darkmagenta;
-						}
-
-						.comment{
-								color:#bbb;
-						}
-					
-						.hi{
-								background:#dfd;							
-						}
-		
-				}
-
-				
-			</style>
+			</script>		
 	</head>
 	<body>
 <?php			
@@ -783,7 +793,9 @@ if($filetype=="php"||$filetype=="js"||$filetype=="html"){
 		echo "<iframe style='width:100%;height:100%;' src='".$filename."?nobread=true'></iframe>";
 }else if($filetype=="md"){
 		$content = file_get_contents("http://localhost".$filename);
+		echo "<div class='markdown'>";
 		echo parseMarkdown($content);
+		echo "</div>";
 }else{
 		// No preview
 }
