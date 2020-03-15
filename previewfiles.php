@@ -113,10 +113,6 @@ date_default_timezone_set('Europe/Stockholm');
 								color:#de935f;
 						}
 
-						.func{
-								color:#607392;
-						}				
-
 						.divider{
 								color:#c5c8c6;
 						}
@@ -136,7 +132,10 @@ date_default_timezone_set('Europe/Stockholm');
 						.name {
 									color:#607392;
 						}
-						
+						.func{
+								color:#cf8843;
+						}				
+					
 						.numeric {
 									color: #ffcc00;
 						}
@@ -577,7 +576,8 @@ function markdownBlock($instring)
 		
 $tags=array("tbody"=>"htmltag","script"=>"htmltag","body"=>"htmltag","html"=>"htmltag","style"=>"htmltag","table"=>"htmltag","tr"=>"htmltag","td"=>"htmltag",
 						"head"=>"htmltag",
-						"foreach"=>"func","if"=>"func","array"=>"func","echo"=>"func","var"=>"func","let"=>"func","as"=>"func");
+						"function"=>"func","if"=>"func","else"=>"func",
+						"for"=>"func","foreach"=>"func","array"=>"func","echo"=>"func","var"=>"func","let"=>"func","as"=>"func");
 		
 function colorize($token,$prevop)
 {
@@ -633,23 +633,32 @@ function syntax($content)
 				$tabs="";			
 				for ($i=0; $i<$length; $i++) {
 						$curstr=$contentrow[$i];
-						if($curstr=="/"&&$prevop=="/"&&$strmode!=2){
+						// Comment is strmode 3
+						if($curstr=="/"&&$prevop=="/"&&$strmode!=3){
 								$ret.=colorize($token,$prevop);
 								$prevop=$curstr;	
-								$strmode=2;
+								$strmode=3;
 								$token="";
-						}else if($curstr=='"'&&$strmode==0){
+						}else if(($curstr=='"'||$curstr=="'")&&$strmode==0){
 								// Start string mode!
 								$ret.=colorize($token,$prevop);
-								$prevop=$curstr;	
-								$strmode=1;
-								$token="";							
-						}else if($curstr=='"'&&$strmode==1){
+								$prevop=$curstr;
+								if($curstr=='"'){
+										$strmode=1;
+								}else{
+										$strmode=2;
+								}
+								$token="";									
+						}else if(($curstr=='"'||$curstr=="'")&&($strmode==1||$strmode==2)){
 								// Print string and disable string mode!
-								$ret.="<span class='string'>&quot;".fixhtml($token)."&quot;</span>";						
+								if($strmode==2){
+										$ret.="<span class='string'>&quot;".fixhtml($token)."&quot;</span>";						
+								}else{
+										$ret.="<span class='string'>&apos;".fixhtml($token)."&apos;</span>";						
+								}
 								$strmode=0;
 								$token="";
-						}else if($strmode==1||$strmode==2){
+						}else if($strmode>0){
 								// Process content in string mode!
 								if($curstr=="<") $curstr="&lt;";
 								if($curstr==" ") $curstr="&nbsp;";
@@ -679,7 +688,7 @@ function syntax($content)
 						}
 				}
 
-				if($strmode!=2){
+				if($strmode!=3){
 						if($tabs!=""){
 								//if($curstr=="<") $ret.="<div style='border-left:1px solid red;'>";
 								$ret.=$tabs;
@@ -722,7 +731,7 @@ function pretty($content)
 								$mode=0;
 								// If end tag write \n after tag -- if start tag 
 								if(strpos($tag,"/")!=false){
-										$indent--;
+										if($indent>0) $indent--;
 										if($prev=="tag") $ret.="\n".indent($indent);
 										$ret.=$tag;
 								}else{
