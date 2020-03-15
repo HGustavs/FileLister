@@ -20,7 +20,9 @@ date_default_timezone_set('Europe/Stockholm');
 				{
 						var dividers=document.getElementsByClassName("divider");
 						for(var i=0;i<dividers.length;i++){
-								dividers[i].style.backgroundColor="#fff";
+							  if (dividers[i].classList.contains("hi")) {
+    								dividers[i].classList.remove("hi");
+  							}
 						}
 				}
 				
@@ -28,7 +30,9 @@ date_default_timezone_set('Europe/Stockholm');
 				{
 						var dividers=document.getElementsByClassName("variable");
 						for(var i=0;i<dividers.length;i++){
-								dividers[i].style.backgroundColor="#fff";
+							  if (dividers[i].classList.contains("hi")) {
+    								dividers[i].classList.remove("hi");
+  							}							
 						}
 				}
 	
@@ -37,7 +41,11 @@ date_default_timezone_set('Europe/Stockholm');
 						var variables=document.getElementsByClassName("variable");
 						var currentvariable=event.target.innerHTML;
 						for(var i=0;i<variables.length;i++){
-								if(variables[i].innerHTML==currentvariable) variables[i].style.backgroundColor="#fdf";
+								if(variables[i].innerHTML==currentvariable){
+										if (!variables[i].classList.contains("hi")) {
+												variables[i].classList.add("hi");
+										}										
+								}
 						}			
 				}
 
@@ -54,7 +62,9 @@ date_default_timezone_set('Europe/Stockholm');
 					
 						var itemno=-1;
 						for(var i=0;i<dividers.length;i++){
-								dividers[i].style.backgroundColor="#fff";
+							  if (dividers[i].classList.contains("hi")) {
+    								dividers[i].classList.remove("hi");
+  							}
 								if(dividers[i].id==event.target.id){
 										itemno=i;
 								} 
@@ -64,7 +74,9 @@ date_default_timezone_set('Europe/Stockholm');
 								var cnt=0;
 								for(var i=itemno+1;i<dividers.length;i++){
 										if(dividers[i].innerHTML==currentend&&cnt==0){
-												dividers[i].style.backgroundColor="#f84";
+												if (!dividers[i].classList.contains("hi")) {
+														dividers[i].classList.add("hi");
+												}
 												break;
 										}else if(dividers[i].innerHTML==currentend){
 												cnt--;
@@ -76,7 +88,9 @@ date_default_timezone_set('Europe/Stockholm');
 								var cnt=0;
 								for(var i=itemno-1;i>0;i--){
 										if(dividers[i].innerHTML==currentend&&cnt==0){
-												dividers[i].style.backgroundColor="#f84";
+												if (!dividers[i].classList.contains("hi")) {
+														dividers[i].classList.add("hi");
+												}
 												break;
 										}else if(dividers[i].innerHTML==currentend){
 												cnt--;
@@ -90,33 +104,88 @@ date_default_timezone_set('Europe/Stockholm');
 			</script>
 			<style>
 				
-				.htmltag{
-						color:darkred;
+				@media (prefers-color-scheme: dark) {
+						.htmltag{
+								color:#de935f;
+						}
+
+						.htmltagend{
+								color:#de935f;
+						}
+
+						.func{
+								color:#607392;
+						}				
+
+						.divider{
+								color:#c5c8c6;
+						}
+
+						.string{
+								color:#8f9d6a;
+						}
+
+						.variable{
+								color:#f9ee98;
+						}
+
+						.comment{
+								color:#bbb;
+						}
+					
+						.name {
+									color:#607392;
+						}
+						
+						.numeric {
+									color: #ffcc00;
+						}
+					
+						.hi{
+								background:#480;							
+						}
+					
 				}
-				
-				.htmltagend{
-						color:darkred;
+
+				@media (prefers-color-scheme: light) {
+						.htmltag{
+								color:darkred;
+						}
+
+						.htmltagend{
+								color:darkred;
+						}
+
+						.func{
+								color:darkgreen;
+						}				
+
+						.divider{
+								color:cadetblue;
+						}
+
+						.string{
+								color:orange;
+						}
+					
+						.numeric{
+								color:orange;
+						}					
+
+						.variable{
+								color:darkmagenta;
+						}
+
+						.comment{
+								color:#bbb;
+						}
+					
+						.hi{
+								background:#dfd;							
+						}
+		
 				}
-				
-				.func{
-						color:darkgreen;
-				}				
-				
-				.divider{
-						color:cadetblue;
-				}
-				
-				.string{
-						color:orange;
-				}
-				
-				.variable{
-						color:darkmagenta;
-				}
-				
-				.comment{
-						color:#bbb;
-				}				
+
 				
 			</style>
 	</head>
@@ -506,7 +575,9 @@ function markdownBlock($instring)
 // colorize - Assign the class depending on the kind of token
 //-------------------------------------------------------------------------------------------------
 		
-$tags=array("body"=>"htmltag","html"=>"htmltag","style"=>"htmltag","table"=>"htmltag","tr"=>"htmltag","td"=>"htmltag","foreach"=>"func","if"=>"func","array"=>"func","echo"=>"func","head"=>"htmltag");
+$tags=array("tbody"=>"htmltag","script"=>"htmltag","body"=>"htmltag","html"=>"htmltag","style"=>"htmltag","table"=>"htmltag","tr"=>"htmltag","td"=>"htmltag",
+						"head"=>"htmltag",
+						"foreach"=>"func","if"=>"func","array"=>"func","echo"=>"func","var"=>"func","let"=>"func","as"=>"func");
 		
 function colorize($token,$prevop)
 {
@@ -523,6 +594,10 @@ function colorize($token,$prevop)
 				return "<span class='".$tags[$testtoken]."'>".$token."</span>";		
 		}else if($prevop=="$"){
 				return "<span class='variable' onmouseover='daxby(event)' onmouseout='clearvar();' >".$token."</span>";				
+		}else if(is_numeric($token)||$token=="true"||$token=="false"||$token=="null"||$token=="undefined"){
+				return "<span class='numeric' >".$token."</span>";				
+		}else{
+				return "<span class='name' >".$token."</span>";					
 		}
 		return $token;
 }
