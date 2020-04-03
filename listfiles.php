@@ -217,9 +217,12 @@ var folder='<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x
 						$tpos=strrpos($filename,".");
 						$tpos=substr($filename,-(strlen($filename)-$tpos-1));
 				}
+				//echo stat($filename);
 				echo "ext:'".$tpos."',";
-				echo "modif:'".date ("Y-m-d H:i:s", filemtime($filename))."',";
-				echo "crea:'".date ("Y-m-d H:i:s", filectime($filename))."'";			
+				echo "modif:'".date ("Y-m-d H:i:s", filemtime($dir."/".$filename))."'";
+				//echo "atime:'".date ("Y-m-d H:i:s", fileatime($filename))."',";
+				//echo "crea:'".date ("Y-m-d H:i:s", filectime($filename))."'";	
+				//echo "crea:'".stat($dir."/".$filename)."'";
         echo "}";
 				$i++;
     }
